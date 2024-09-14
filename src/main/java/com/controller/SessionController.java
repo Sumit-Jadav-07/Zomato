@@ -1,6 +1,7 @@
 package com.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.entity.CustomerEntity;
@@ -8,13 +9,18 @@ import com.entity.RestaurantEntity;
 import com.repository.CustomerRepository;
 import com.repository.RestaurantRepository;
 import com.service.LoginRequest;
+import com.service.OtpService;
+import com.service.Services;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,7 +40,13 @@ public class SessionController {
   BCryptPasswordEncoder encoder;
 
   @Autowired
-  HttpServletResponse response;
+  OtpService otpservice;
+
+  @Autowired
+  JavaMailSender sender;
+
+  @Autowired
+  Services service;
 
   @PostMapping("/customer")
   public String addCustomer(@RequestBody CustomerEntity entity) {
@@ -58,9 +70,9 @@ public class SessionController {
     } else {
       switch (loginRequest.getRole().toLowerCase()) {
         case "customer":
-          return customerLogin(loginRequest);
+          return service.customerLogin(loginRequest);
         case "restaurant":
-          return restaurantLogin(loginRequest);
+          return service.restaurantLogin(loginRequest);
         default:
           return ResponseEntity.badRequest().body("Invalid Role Specified");
       }
@@ -69,7 +81,7 @@ public class SessionController {
   }
 
   @GetMapping("/logout")
-  public ResponseEntity<?> logout(HttpServletRequest request) {
+  public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
 
     Cookie[] cookies = request.getCookies();
     if (cookies != null) {
@@ -86,40 +98,37 @@ public class SessionController {
     return ResponseEntity.badRequest().body("No active session found");
   }
 
-  private ResponseEntity<?> customerLogin(LoginRequest loginRequest) {
-    CustomerEntity customer = customerRepo.findByEmail(loginRequest.getEmail());
-    if (customer != null) {
-      String encryptedPassword = customer.getPassword();
-      if (encoder.matches(loginRequest.getPassword(), encryptedPassword)) {
-        Cookie cookie = new Cookie("customer", String.valueOf(customer.getCustomerId()));
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(15 * 24 * 60 * 60);
-        response.addCookie(cookie);
-        return ResponseEntity.ok("Login Successful");
-      } else {
-        return ResponseEntity.badRequest().body("Invalid Password");
-      }
+  @PostMapping("/sendotp")
+  public ResponseEntity<String> sendOtp(@RequestParam String email, @RequestParam String role, HttpSession session) {
+    Object entity = service.findEntityByEmailAndRole(email, role);
+    if (entity == null) {
+      return ResponseEntity.badRequest().body(role + " email not found");
     }
-    return ResponseEntity.ok("Invalid Email");
+    String otp = otpservice.getOtp();
+    SimpleMailMessage message = new SimpleMailMessage();
+    message.setTo(email);
+    message.setSubject("OTP");
+    message.setText(otp);
+    sender.send(message);
+    session.setAttribute("otp", otp);
+    return ResponseEntity.ok("OTP sent successfully");
   }
 
-  private ResponseEntity<?> restaurantLogin(LoginRequest loginRequest) {
-    RestaurantEntity restaurant = restaurantRepo.findByEmail(loginRequest.getEmail());
-    if (restaurant != null) {
-      String encryptedPassword = restaurant.getPassword();
-      if (encoder.matches(loginRequest.getPassword(), encryptedPassword)) {
-        Cookie cookie = new Cookie("restaurant", String.valueOf(restaurant.getRestaurantId()));
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(15 * 24 * 60 * 60);
-        response.addCookie(cookie);
-        return ResponseEntity.ok("Login Successful");
-      } else {
-        return ResponseEntity.badRequest().body("Invalid Password");
-      }
+  @PostMapping("/forgotpassword")
+  public ResponseEntity<String> forgotPassword(@RequestParam String email, @RequestParam String password,
+      @RequestParam String role) {
+    Object entity = service.findEntityByEmailAndRole(email, role);
+    if (entity == null) {
+      return ResponseEntity.badRequest().body(role + " email not found");
     }
-    return ResponseEntity.ok("Invalid Email");
+    if (entity instanceof CustomerEntity) {
+      ((CustomerEntity) entity).setPassword(password);
+      customerRepo.save((CustomerEntity) entity);
+    } else if (entity instanceof RestaurantEntity) {
+      ((RestaurantEntity) entity).setPassword(password);
+      restaurantRepo.save((RestaurantEntity) entity);
+    }
+    return ResponseEntity.ok("Password updated successfully");
   }
 
 }
