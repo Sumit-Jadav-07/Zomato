@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,14 +23,6 @@ public class CustomerController {
 
 	@Autowired
 	CustomerRepository repo;
-
-	@PostMapping
-	public String addCustomer(@RequestBody CustomerEntity entity) {
-		System.out.println(entity.getFullName());
-		System.out.println(entity.getEmail());
-		repo.save(entity);
-		return "Success";
-	}
 
 	@GetMapping
 	public List<CustomerEntity> listCustomers() {
