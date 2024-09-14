@@ -1,7 +1,6 @@
 package com.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.entity.CustomerEntity;
@@ -99,7 +98,9 @@ public class SessionController {
   }
 
   @PostMapping("/sendotp")
-  public ResponseEntity<String> sendOtp(@RequestParam String email, @RequestParam String role, HttpSession session) {
+  public ResponseEntity<String> sendOtp(@RequestBody LoginRequest loginRequest, HttpSession session) {
+    String email = loginRequest.getEmail();
+    String role = loginRequest.getRole();
     Object entity = service.findEntityByEmailAndRole(email, role);
     if (entity == null) {
       return ResponseEntity.badRequest().body(role + " email not found");
@@ -111,24 +112,38 @@ public class SessionController {
     message.setText(otp);
     sender.send(message);
     session.setAttribute("otp", otp);
+    session.setAttribute("role", role);
     return ResponseEntity.ok("OTP sent successfully");
   }
 
   @PostMapping("/forgotpassword")
-  public ResponseEntity<String> forgotPassword(@RequestParam String email, @RequestParam String password,
-      @RequestParam String role) {
-    Object entity = service.findEntityByEmailAndRole(email, role);
+  public ResponseEntity<String> forgotPassword(@RequestBody LoginRequest loginRequest, HttpSession session) {
+    String email = loginRequest.getEmail();
+    String password = loginRequest.getPassword();
+    String otp = loginRequest.getOtp();
+    String storedOtp = (String) session.getAttribute("otp");
+    String storedRole = (String) session.getAttribute("role");
+
+    if (storedOtp == null || !storedOtp.equals(otp)) {
+      return ResponseEntity.badRequest().body("Invalid OTP. Please request a new one");
+    }
+
+    Object entity = service.findEntityByEmailAndRole(email, storedRole);
+
     if (entity == null) {
-      return ResponseEntity.badRequest().body(role + " email not found");
+      return ResponseEntity.badRequest().body(storedRole + " email not found");
     }
     if (entity instanceof CustomerEntity) {
-      ((CustomerEntity) entity).setPassword(password);
-      customerRepo.save((CustomerEntity) entity);
+      CustomerEntity customerEntity = (CustomerEntity) entity;
+      customerEntity.setPassword(encoder.encode(password));
+      customerRepo.save(customerEntity);
     } else if (entity instanceof RestaurantEntity) {
-      ((RestaurantEntity) entity).setPassword(password);
-      restaurantRepo.save((RestaurantEntity) entity);
+      RestaurantEntity restaurantEntity = (RestaurantEntity) entity;
+      restaurantEntity.setPassword(encoder.encode(password));
+      restaurantRepo.save(restaurantEntity);
+    } else {
+      return ResponseEntity.badRequest().body("Invalid user type");
     }
     return ResponseEntity.ok("Password updated successfully");
   }
-
 }
