@@ -76,7 +76,6 @@ public class SessionController {
           return ResponseEntity.badRequest().body("Invalid Role Specified");
       }
     }
-
   }
 
   @GetMapping("/logout")
