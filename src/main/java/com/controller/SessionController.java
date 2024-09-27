@@ -49,8 +49,8 @@ public class SessionController {
 
   @PostMapping("/customer")
   public String addCustomer(@RequestBody CustomerEntity entity) {
-    System.out.println(entity.getFullName());
-    System.out.println(entity.getEmail());
+    // System.out.println(entity.getFullName());
+    // System.out.println(entity.getEmail());
     entity.setPassword(encoder.encode(entity.getPassword()));
     customerRepo.save(entity);
     return "Success";

@@ -1,5 +1,7 @@
 package com.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -38,7 +40,9 @@ public class Services {
                 cookie.setHttpOnly(true);
                 cookie.setMaxAge(15 * 24 * 60 * 60);
                 response.addCookie(cookie);
-                return ResponseEntity.ok("Login Successful");
+                List<RestaurantEntity> restaurants = restaurantRepo.findAll();
+                LoginResponse login = new LoginResponse("Login Successful", restaurants);
+                return ResponseEntity.ok(login);
             } else {
                 return ResponseEntity.badRequest().body("Invalid Password");
             }
