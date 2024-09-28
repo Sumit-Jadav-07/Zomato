@@ -36,5 +36,8 @@ public class MenuEntity {
 
   @OneToMany(mappedBy = "menu")
   private List<MenuItemEntity> menuItems;
+
+  @OneToMany(mappedBy = "menu")
+  private List<CartEntity> carts;
   
 }

@@ -35,4 +35,7 @@ public class CustomerEntity {
 	@OneToMany(mappedBy = "customer")
 	private List<CustomerAddressEntity> CustomerAddresses;
 
+	@OneToMany(mappedBy = "customer")
+	private List<CartEntity> carts;
+
 }

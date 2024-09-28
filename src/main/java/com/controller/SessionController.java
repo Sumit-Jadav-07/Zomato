@@ -1,5 +1,9 @@
 package com.controller;
 
+import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -69,7 +73,11 @@ public class SessionController {
     } else {
       switch (loginRequest.getRole().toLowerCase()) {
         case "customer":
-          return service.customerLogin(loginRequest);
+          List<RestaurantEntity> restaurants = restaurantRepo.findByActiveStatus(true);
+          Map<String, Object> response = new HashMap<>();
+          response.put("message", "Login Successful as Customer.");
+          response.put("restaurants", restaurants);
+          return ResponseEntity.ok(response);
         case "restaurant":
           return service.restaurantLogin(loginRequest);
         default:
