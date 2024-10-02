@@ -41,8 +41,12 @@ public class MenuController {
   @Autowired
   HttpServletResponse response;
 
-  @PostMapping
-  public String addMenu(@RequestBody MenuEntity entity) {
+  @PostMapping("{restaurantId}")
+  public String addMenu(@RequestBody MenuEntity entity, @PathVariable Integer restaurantId) {
+    if (entity.getRestaurant() == null) {
+      entity.setRestaurant(new RestaurantEntity());
+    }
+    entity.getRestaurant().setRestaurantId(restaurantId);
     repo.save(entity);
     return "Success";
   }

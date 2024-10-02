@@ -29,14 +29,6 @@ public class CartEntity {
   @JoinColumn(name = "restaurantId")
   private RestaurantEntity restaurant;
 
-  @ManyToOne
-  @JoinColumn(name = "menuId")
-  private MenuEntity menu;
-
-  @ManyToOne
-  @JoinColumn(name = "itemId")
-  private MenuItemEntity item;
-
-  Integer quantity;
+  Integer offerAmount;
 
 }

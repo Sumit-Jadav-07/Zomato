@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.entity.MenuEntity;
 import com.entity.MenuItemEntity;
 import com.repository.MenuItemRepository;
 
@@ -24,14 +25,19 @@ public class MenuItemController {
   @Autowired
   MenuItemRepository repo;
 
-  @PostMapping
-  public String addMenuItem(@RequestBody MenuItemEntity entity) {
+  @PostMapping("{menuId}")
+  public String addMenuItem(@RequestBody MenuItemEntity entity, @PathVariable Integer menuId) {
+    if(entity.getMenu() == null){
+      MenuEntity menu = new MenuEntity();
+      menu.setMenuId(menuId);
+      entity.setMenu(menu);
+    }
     repo.save(entity);
     return "Success";
   }
 
   @GetMapping
-  public List<MenuItemEntity> getMenuItem() {
+  public List<MenuItemEntity> getAllMenuItem() {
     return repo.findAll();
   }
 
@@ -45,6 +51,15 @@ public class MenuItemController {
     }
   }
 
+  @GetMapping("/menu/{menuId}")
+  public ResponseEntity<List<MenuItemEntity>> getMenuItemsByMenuId(@PathVariable Integer menuId) {
+    List<MenuItemEntity> menuItems = repo.findByMenuMenuId(menuId);
+    if (menuItems.isEmpty()) {
+      return ResponseEntity.notFound().build();
+    }
+    return ResponseEntity.ok(menuItems);
+  }
+
   @DeleteMapping("{itemId}")
   public String deleteMenuItem(@PathVariable Integer itemId) {
     repo.deleteById(itemId);
@@ -52,7 +67,7 @@ public class MenuItemController {
   }
 
   @PutMapping
-  public ResponseEntity<?> updateItem(@RequestBody MenuItemEntity entity) {
+  public ResponseEntity<?> updateMenuItem(@RequestBody MenuItemEntity entity) {
     Optional<MenuItemEntity> op = repo.findById(entity.getItemId());
     if (op.isPresent()) {
       repo.save(entity);
