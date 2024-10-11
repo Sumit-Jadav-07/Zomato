@@ -1,7 +1,7 @@
 package com.controller;
 
 import java.util.Optional;
-
+import java.util.HashMap;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -94,6 +94,19 @@ public class MenuController {
     } else {
       return ResponseEntity.notFound().build();
     }
+  }
+
+  @GetMapping("/restaurant/{restaurantId}")
+  public ResponseEntity<?> getMenuItemsByMenuId(@PathVariable Integer restaurantId) {
+    List<MenuEntity> menus = repo.findByRestaurantRestaurantId(restaurantId);
+    RestaurantEntity restaurant = resRepo.findById(restaurantId).get();
+    HashMap<String,Object> res = new HashMap<String, Object>();
+    res.put("restaurant", restaurant);
+    res.put("menu", menus);
+    if (menus.isEmpty()) {
+      return ResponseEntity.notFound().build();
+    }
+    return ResponseEntity.ok(res);
   }
 
   @DeleteMapping("{menuId}")

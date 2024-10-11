@@ -13,5 +13,4 @@ public interface MenuRepository extends JpaRepository<MenuEntity, Integer> {
 
   List<MenuEntity> findByRestaurant(RestaurantEntity restaurant);
   List<MenuEntity> findByRestaurantRestaurantId(Integer restaurantId);
-  
 }

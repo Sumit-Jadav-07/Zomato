@@ -1,5 +1,6 @@
 package com.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.entity.MenuEntity;
 import com.entity.MenuItemEntity;
 import com.repository.MenuItemRepository;
+import com.repository.MenuRepository;
 
 @RestController
 @RequestMapping("api/menuitem")
@@ -24,6 +26,9 @@ public class MenuItemController {
 
   @Autowired
   MenuItemRepository repo;
+
+  @Autowired
+  MenuRepository menuRepo;
 
   @PostMapping("{menuId}")
   public String addMenuItem(@RequestBody MenuItemEntity entity, @PathVariable Integer menuId) {
@@ -52,12 +57,16 @@ public class MenuItemController {
   }
 
   @GetMapping("/menu/{menuId}")
-  public ResponseEntity<List<MenuItemEntity>> getMenuItemsByMenuId(@PathVariable Integer menuId) {
+  public ResponseEntity<?> getMenuItemsByMenuId(@PathVariable Integer menuId) {
     List<MenuItemEntity> menuItems = repo.findByMenuMenuId(menuId);
+    MenuEntity menu = menuRepo.findById(menuId).get();
+    HashMap<String, Object> obj = new HashMap<String, Object>();
+    obj.put("menuitems",menuItems);
+    obj.put("menu",menu);
     if (menuItems.isEmpty()) {
       return ResponseEntity.notFound().build();
     }
-    return ResponseEntity.ok(menuItems);
+    return ResponseEntity.ok(obj);
   }
 
   @DeleteMapping("{itemId}")
