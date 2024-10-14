@@ -11,8 +11,10 @@ import com.entity.CustomerEntity;
 import com.entity.RestaurantEntity;
 import com.repository.CustomerRepository;
 import com.repository.RestaurantRepository;
+import com.service.CustomerService;
 import com.service.LoginRequest;
 import com.service.OtpService;
+import com.service.RestaurantService;
 import com.service.Services;
 
 import jakarta.servlet.http.Cookie;
@@ -51,6 +53,12 @@ public class SessionController {
   @Autowired
   Services service;
 
+  @Autowired
+  CustomerService customerService;
+
+  @Autowired
+  RestaurantService restaurantService;
+
   @PostMapping("/customer")
   public String addCustomer(@RequestBody CustomerEntity entity) {
     entity.setPassword(encoder.encode(entity.getPassword()));
@@ -77,7 +85,7 @@ public class SessionController {
           response.put("restaurants", restaurants);
           return ResponseEntity.ok(response);
         case "restaurant":
-          return service.restaurantLogin(loginRequest);
+          return restaurantService.restaurantLogin(loginRequest);
         default:
           return ResponseEntity.badRequest().body("Invalid Role Specified");
       }
