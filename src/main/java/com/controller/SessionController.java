@@ -81,40 +81,55 @@ public class SessionController {
   public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
     if (loginRequest.getRole() == null) {
       return ResponseEntity.badRequest().body("Role not specified");
-    } else {
-      switch (loginRequest.getRole().toLowerCase()) {
-        case "customer":
-          CustomerEntity customer = customerService.authenticateCustomer(loginRequest.getEmail(),
-              loginRequest.getPassword());
-          if (customer != null) {
-            String token = service.generateToken(loginRequest.getEmail());
-            List<RestaurantEntity> restaurants = restaurantRepo.findByActiveStatus(true);
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "Login Successful as Customer.");
-            response.put("restaurants", restaurants);
-            return ResponseEntity.ok()
-                .header("Authorization", "Bearer " + token)
-                .body(response);
-          } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
-          }
+    }
 
-        case "restaurant":
-          RestaurantEntity restaurant = restaurantService.authenticateRestaurant(loginRequest.getEmail(),
-              loginRequest.getPassword());
-          if (restaurant != null) {
-            String token = jwtService.generateToken(restaurant.getEmail(), loginRequest.getRole());
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "Login Successful as Restaurant.");
-            return ResponseEntity.ok()
-                .header("Authorization", "Bearer " + token)
-                .body(response);
-          } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
-          }
-        default:
-          return ResponseEntity.badRequest().body("Invalid Role Specified");
-      }
+    switch (loginRequest.getRole().toLowerCase()) {
+      case "customer":
+        CustomerEntity customer = customerService.authenticateCustomer(loginRequest.getEmail(),
+            loginRequest.getPassword());
+        if (customer != null) {
+          
+          // Generate a random token (not JWT)
+          String token = service.generateToken();// Use a simple random UUID as the token
+          System.out.println("Before");
+          System.out.println(token);
+          System.out.println("After");
+          customerService.saveToken(loginRequest.getEmail(), token); // Store token in DB or in-memory store like Redis
+          List<RestaurantEntity> restaurants = restaurantRepo.findByActiveStatus(true);
+
+          Map<String, Object> response = new HashMap<>();
+          response.put("message", "Login Successful as Customer.");
+          response.put("restaurants", restaurants);
+
+          return ResponseEntity.ok()
+              .header("Authorization", "Bearer " + token) // Send token in the response header
+              .body(response);
+        } else {
+          return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
+        }
+
+      case "restaurant":
+        RestaurantEntity restaurant = restaurantService.authenticateRestaurant(loginRequest.getEmail(),
+            loginRequest.getPassword());
+        if (restaurant != null) {
+          String token = service.generateToken();
+          System.out.println("Before");
+          System.out.println(token);
+          System.out.println("After");
+          restaurantService.saveToken(loginRequest.getEmail(), token); // Store the token
+
+          Map<String, Object> response = new HashMap<>();
+          response.put("message", "Login Successful as Restaurant.");
+
+          return ResponseEntity.ok()
+              .header("Authorization", "Bearer " + token)
+              .body(response);
+        } else {
+          return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
+        }
+
+      default:
+        return ResponseEntity.badRequest().body("Invalid Role Specified");
     }
   }
 

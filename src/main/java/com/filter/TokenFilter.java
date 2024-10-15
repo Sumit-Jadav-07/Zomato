@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Component;
 
+import com.service.CustomerService;
+import com.service.RestaurantService;
 import com.service.Services;
 
 import jakarta.servlet.Filter;
@@ -24,6 +26,12 @@ public class TokenFilter implements Filter {
 
   @Autowired
   private Services service;
+
+  @Autowired
+  private CustomerService customerService;
+
+  @Autowired
+  private RestaurantService restaurantService;
 
   // ----------------------- This method uses a JWT Way -----------------------
   // @Override
@@ -75,29 +83,37 @@ public class TokenFilter implements Filter {
       throws IOException, ServletException {
 
     HttpServletRequest req = (HttpServletRequest) request;
-    String token = req.getHeader("Authorization");
+    HttpServletResponse res = (HttpServletResponse) response;
     String url = req.getRequestURL().toString();
 
-    if (url.contains("/public/")) {
-      chain.doFilter(request, response);
-    } else if (url.contains("/private/")) {
-
+    if (url.contains("/private/")) {
+      String token = req.getHeader("Authorization");
+      System.out.println("TokenFilter Token --> " + token);
       if (token != null && token.startsWith("Bearer ")) {
         token = token.substring(7);
-        String email = service.validateToken(token);
-
-        if (email != null) {
+        String customerEmail = customerService.getEmailByToken(token);
+        if (customerEmail != null) {
           chain.doFilter(request, response);
           return;
         }
+
+        String restaurantEmail = restaurantService.getEmailByToken(token);
+        if (restaurantEmail != null) {
+          chain.doFilter(request, response);
+          return;
+        }
+
+        res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        res.getWriter().write("Invalid or expired token");
+        return;
+
+      } else {
+        // Token is missing or invalid; respond with 401
+        res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        res.getWriter().write("Invalid or missing token");
       }
+    } else {
+      chain.doFilter(request, response);
     }
-
-    // Token is missing or invalid; respond with 401
-    HttpServletResponse res = (HttpServletResponse) response;
-    res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-    res.getWriter().write("Invalid or missing token");
-
   }
-
 }

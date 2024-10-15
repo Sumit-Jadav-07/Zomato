@@ -5,7 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.entity.CustomerEntity;
 import com.entity.RestaurantEntity;
 import com.repository.RestaurantRepository;
 
@@ -48,6 +47,17 @@ public class RestaurantService {
       return restaurant;
     }
     return null;
+  }
+
+  public void saveToken(String email, String token){
+    RestaurantEntity restaurant = restaurantRepo.findByEmail(email);
+    restaurant.setResToken(token);
+    restaurantRepo.save(restaurant);
+  }
+
+  public String getEmailByToken(String token){
+    RestaurantEntity restaurant = restaurantRepo.findByResToken(token);
+    return (restaurant != null) ? restaurant.getEmail() : null;
   }
 
 }

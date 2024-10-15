@@ -58,4 +58,15 @@ public class CustomerService {
     return null;
   }
 
+  public void saveToken(String email, String token){
+    CustomerEntity customer = customerRepo.findByEmail(email);
+    customer.setCusToken(token);
+    customerRepo.save(customer);
+  }
+
+  public String getEmailByToken(String token){
+    CustomerEntity customer = customerRepo.findByCusToken(token);
+    return (customer != null) ? customer.getEmail() : null;
+  }
+
 }

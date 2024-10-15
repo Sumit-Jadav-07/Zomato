@@ -32,6 +32,7 @@ public class RestaurantEntity {
   Boolean onlineStatus;
   Boolean activeStatus = true;
   String restaurantImagePath;
+  String resToken;
 
   @OneToMany(mappedBy = "restaurant")
   private List<RestaurantAddressEntity> RestaurantAddresses;

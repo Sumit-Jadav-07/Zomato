@@ -19,8 +19,8 @@ public class Services {
     @Autowired
     RestaurantRepository restaurantRepo;
 
-    // In-memory token store
-    private Map<String, Object> tokenStore = new HashMap<>();
+    // // In-memory token store
+    // private Map<String, Object> tokenStore = new HashMap<>();
 
     public Object findEntityByEmailAndRole(String email, String role) {
         switch (role.toLowerCase()) {
@@ -33,13 +33,15 @@ public class Services {
         }
     }
 
-    public String generateToken(String email){
-        String token = UUID.randomUUID().toString();
-        tokenStore.put(token, email);
-        return token;
+    public String generateToken(){
+        return UUID.randomUUID().toString();
     }
 
-    public String validateToken(String token){
-        return tokenStore.get(token).toString();
-    }
+    // public void storeToken(String email, String token){
+    //     tokenStore.put(email, token);
+    // }
+
+    // public boolean validateToken(String token){
+    //     return tokenStore.containsValue(token);
+    // }
 }

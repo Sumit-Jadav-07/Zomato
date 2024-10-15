@@ -31,6 +31,7 @@ public class CustomerEntity {
 	String address1;
 	String address2;
 	String customerImagePath;
+	String cusToken;
 
 	@OneToMany(mappedBy = "customer")
 	private List<CustomerAddressEntity> CustomerAddresses;
