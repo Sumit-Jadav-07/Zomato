@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import com.entity.CustomerEntity;
 import com.entity.RestaurantEntity;
@@ -14,6 +15,7 @@ import com.repository.RestaurantRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
+@Service
 public class CustomerService {
 
   @Autowired
@@ -46,6 +48,14 @@ public class CustomerService {
       }
     }
     return ResponseEntity.ok("Invalid Email");
+  }
+
+  public CustomerEntity authenticateCustomer(String email, String password){
+    CustomerEntity customer = customerRepo.findByEmail(email);
+    if(customer != null && encoder.matches(password, customer.getPassword())){
+      return customer;
+    }
+    return null;
   }
 
 }

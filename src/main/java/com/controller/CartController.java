@@ -15,7 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @RestController
-@RequestMapping("/api/cart")
+@RequestMapping("/api/private/cart")
 public class CartController {
 
   @Autowired

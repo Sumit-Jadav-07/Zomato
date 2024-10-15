@@ -18,7 +18,7 @@ import com.entity.CustomerEntity;
 import com.repository.CustomerRepository;
 
 @RestController
-@RequestMapping("/api/customers")
+@RequestMapping("/api/private/customers")
 public class CustomerController {
 
 	@Autowired

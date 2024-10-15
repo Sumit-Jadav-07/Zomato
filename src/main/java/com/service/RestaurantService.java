@@ -3,13 +3,16 @@ package com.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
 
+import com.entity.CustomerEntity;
 import com.entity.RestaurantEntity;
 import com.repository.RestaurantRepository;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
+@Service
 public class RestaurantService {
 
   @Autowired
@@ -37,6 +40,14 @@ public class RestaurantService {
       }
     }
     return ResponseEntity.ok("Invalid Email");
+  }
+
+  public RestaurantEntity authenticateRestaurant(String email, String password){
+    RestaurantEntity restaurant = restaurantRepo.findByEmail(email);
+    if(restaurant != null && encoder.matches(password, restaurant.getPassword())){
+      return restaurant;
+    }
+    return null;
   }
 
 }

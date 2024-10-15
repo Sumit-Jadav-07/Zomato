@@ -19,7 +19,7 @@ import com.entity.RestaurantAddressEntity;
 import com.repository.RestaurantAddressRepository;
 
 @RestController
-@RequestMapping("/api/restaurantaddress")
+@RequestMapping("/api/private/restaurantaddress")
 public class RestaurantAddressController {
 
   @Autowired

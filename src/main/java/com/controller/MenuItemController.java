@@ -21,7 +21,7 @@ import com.repository.MenuItemRepository;
 import com.repository.MenuRepository;
 
 @RestController
-@RequestMapping("api/menuitem")
+@RequestMapping("api/private/menuitem")
 public class MenuItemController {
 
   @Autowired

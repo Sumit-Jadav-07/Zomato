@@ -12,6 +12,7 @@ import com.entity.RestaurantEntity;
 import com.repository.CustomerRepository;
 import com.repository.RestaurantRepository;
 import com.service.CustomerService;
+import com.service.JWTService;
 import com.service.LoginRequest;
 import com.service.OtpService;
 import com.service.RestaurantService;
@@ -23,6 +24,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -32,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
-@RequestMapping("/api/session")
+@RequestMapping("/api/public/session")
 public class SessionController {
 
   @Autowired
@@ -59,6 +61,9 @@ public class SessionController {
   @Autowired
   RestaurantService restaurantService;
 
+  @Autowired
+  JWTService jwtService;
+
   @PostMapping("/customer")
   public String addCustomer(@RequestBody CustomerEntity entity) {
     entity.setPassword(encoder.encode(entity.getPassword()));
@@ -79,13 +84,34 @@ public class SessionController {
     } else {
       switch (loginRequest.getRole().toLowerCase()) {
         case "customer":
-          List<RestaurantEntity> restaurants = restaurantRepo.findByActiveStatus(true);
-          Map<String, Object> response = new HashMap<>();
-          response.put("message", "Login Successful as Customer.");
-          response.put("restaurants", restaurants);
-          return ResponseEntity.ok(response);
+          CustomerEntity customer = customerService.authenticateCustomer(loginRequest.getEmail(),
+              loginRequest.getPassword());
+          if (customer != null) {
+            String token = service.generateToken(loginRequest.getEmail());
+            List<RestaurantEntity> restaurants = restaurantRepo.findByActiveStatus(true);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Login Successful as Customer.");
+            response.put("restaurants", restaurants);
+            return ResponseEntity.ok()
+                .header("Authorization", "Bearer " + token)
+                .body(response);
+          } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
+          }
+
         case "restaurant":
-          return restaurantService.restaurantLogin(loginRequest);
+          RestaurantEntity restaurant = restaurantService.authenticateRestaurant(loginRequest.getEmail(),
+              loginRequest.getPassword());
+          if (restaurant != null) {
+            String token = jwtService.generateToken(restaurant.getEmail(), loginRequest.getRole());
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Login Successful as Restaurant.");
+            return ResponseEntity.ok()
+                .header("Authorization", "Bearer " + token)
+                .body(response);
+          } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
+          }
         default:
           return ResponseEntity.badRequest().body("Invalid Role Specified");
       }
