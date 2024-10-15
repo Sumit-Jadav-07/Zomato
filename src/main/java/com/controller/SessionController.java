@@ -88,7 +88,6 @@ public class SessionController {
         CustomerEntity customer = customerService.authenticateCustomer(loginRequest.getEmail(),
             loginRequest.getPassword());
         if (customer != null) {
-          
           // Generate a random token (not JWT)
           String token = service.generateToken();// Use a simple random UUID as the token
           System.out.println("Before");
@@ -99,6 +98,7 @@ public class SessionController {
 
           Map<String, Object> response = new HashMap<>();
           response.put("message", "Login Successful as Customer.");
+          response.put("token", token);
           response.put("restaurants", restaurants);
 
           return ResponseEntity.ok()
