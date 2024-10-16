@@ -16,7 +16,6 @@ import com.entity.RestaurantEntity;
 import com.repository.CartRepository;
 import com.repository.CustomerRepository;
 import com.repository.MenuItemRepository;
-import com.repository.MenuRepository;
 import com.repository.RestaurantRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
