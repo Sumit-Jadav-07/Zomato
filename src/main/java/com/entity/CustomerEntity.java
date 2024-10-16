@@ -33,10 +33,10 @@ public class CustomerEntity {
 	String customerImagePath;
 	String cusToken;
 
-	@OneToMany(mappedBy = "customer")
-	private List<CustomerAddressEntity> CustomerAddresses;
+	// @OneToMany(mappedBy = "customer")
+	// private List<CustomerAddressEntity> CustomerAddresses;
 
-	@OneToMany(mappedBy = "customer")
-	private List<CartEntity> carts;
+	// @OneToMany(mappedBy = "customer")
+	// private List<CartEntity> carts;
 
 }

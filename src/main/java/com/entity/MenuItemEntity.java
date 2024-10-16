@@ -26,11 +26,18 @@ public class MenuItemEntity {
   @JoinColumn(name = "menuId")
   private MenuEntity menu;
 
+  @ManyToOne
+  @JoinColumn(name = "restaurantId")
+  private RestaurantEntity restaurant;
+
   String itemName;
   String itemDescription;
-  String itemPrice;
+  Double itemPrice;
   Boolean activeStatus = true;
   String itemImagePath;
   Boolean isOffer = true;
+  Integer offerQty;
+  Double offerPercentage;
+  Double uptoAmount;
   
 }

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 import com.service.CustomerService;
 import com.service.RestaurantService;
-import com.service.Services;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -24,8 +23,8 @@ public class TokenFilter implements Filter {
   // @Autowired
   // private JWTService jwtService;
 
-  @Autowired
-  private Services service;
+  // @Autowired
+  // private Services service;
 
   @Autowired
   private CustomerService customerService;
@@ -94,9 +93,15 @@ public class TokenFilter implements Filter {
         token = token.substring(7);
 
         String customerEmail = customerService.getEmailByToken(token);
+        System.out.println("Token Customer Email " + customerEmail);
         if (customerEmail != null) {
-          chain.doFilter(request, response);
-          return;
+          Integer customerId = customerService.getCustomerIdByEmail(customerEmail);
+          System.out.println("Token CustomerId " + customerId);
+          if (customerId != null) { // Ensure customerId is also not null
+            request.setAttribute("customerId", customerId);
+            chain.doFilter(request, response);
+            return;
+          }
         }
 
         String restaurantEmail = restaurantService.getEmailByToken(token);

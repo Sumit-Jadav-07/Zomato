@@ -69,6 +69,11 @@ public class CustomerService {
     return (customer != null) ? customer.getEmail() : null;
   }
 
+  public Integer getCustomerIdByEmail(String email){
+    CustomerEntity customer = customerRepo.findByEmail(email);
+    return (customer != null ) ? customer.getCustomerId() : null;
+  }
+
   public boolean removeToken(String token){
     CustomerEntity customer = customerRepo.findByCusToken(token);
     if(customer != null){

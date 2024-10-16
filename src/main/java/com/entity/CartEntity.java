@@ -29,6 +29,6 @@ public class CartEntity {
   @JoinColumn(name = "restaurantId")
   private RestaurantEntity restaurant;
 
-  Integer offerAmount;
+  Double offerAmount;
 
 }

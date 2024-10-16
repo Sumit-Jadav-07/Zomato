@@ -12,5 +12,6 @@ public interface MenuItemRepository extends JpaRepository<MenuItemEntity, Intege
   List<MenuItemEntity> findByActiveStatus(Boolean activeStatus);
   List<MenuItemEntity> findByMenu(MenuEntity menu);
   List<MenuItemEntity> findByMenuMenuId(Integer menuId);
+  MenuItemEntity findMenuItemByItemId(Integer itemId);
   
 }

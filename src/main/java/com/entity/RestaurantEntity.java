@@ -34,13 +34,13 @@ public class RestaurantEntity {
   String restaurantImagePath;
   String resToken;
 
-  @OneToMany(mappedBy = "restaurant")
-  private List<RestaurantAddressEntity> RestaurantAddresses;
+  // @OneToMany(mappedBy = "restaurant")
+  // private List<RestaurantAddressEntity> RestaurantAddresses;
+
+  // // @OneToMany(mappedBy = "restaurant")
+  // // private List<MenuEntity> Menus;
 
   // @OneToMany(mappedBy = "restaurant")
-  // private List<MenuEntity> Menus;
-
-  @OneToMany(mappedBy = "restaurant")
-  private List<CartEntity> carts;
+  // private List<CartEntity> carts;
   
 }
