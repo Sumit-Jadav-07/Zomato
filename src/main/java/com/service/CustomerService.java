@@ -69,4 +69,14 @@ public class CustomerService {
     return (customer != null) ? customer.getEmail() : null;
   }
 
+  public boolean removeToken(String token){
+    CustomerEntity customer = customerRepo.findByCusToken(token);
+    if(customer != null){
+      customer.setCusToken(null);
+      customerRepo.save(customer);
+      return true;
+    }
+    return false;
+  }
+
 }

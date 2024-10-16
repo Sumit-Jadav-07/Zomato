@@ -60,4 +60,14 @@ public class RestaurantService {
     return (restaurant != null) ? restaurant.getEmail() : null;
   }
 
+  public boolean removeToken(String token){
+    RestaurantEntity restaurant = restaurantRepo.findByResToken(token);
+    if(restaurant != null){
+      restaurant.setResToken(null);
+      restaurantRepo.save(restaurant);
+      return true;
+    }
+    return false;
+  }
+
 }

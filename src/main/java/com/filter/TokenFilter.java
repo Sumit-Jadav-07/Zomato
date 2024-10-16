@@ -90,7 +90,9 @@ public class TokenFilter implements Filter {
       String token = req.getHeader("Authorization");
       System.out.println("TokenFilter Token --> " + token);
       if (token != null && token.startsWith("Bearer ")) {
+
         token = token.substring(7);
+
         String customerEmail = customerService.getEmailByToken(token);
         if (customerEmail != null) {
           chain.doFilter(request, response);
@@ -111,6 +113,7 @@ public class TokenFilter implements Filter {
         // Token is missing or invalid; respond with 401
         res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         res.getWriter().write("Invalid or missing token");
+        return;
       }
     } else {
       chain.doFilter(request, response);

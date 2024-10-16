@@ -135,20 +135,18 @@ public class SessionController {
 
   @GetMapping("/logout")
   public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
-
-    Cookie[] cookies = request.getCookies();
-    if (cookies != null) {
-      for (Cookie cookie : cookies) {
-        if (cookie.getName().equals("customer") || cookie.getName().equals("restaurant")) {
-          cookie.setValue("");
-          cookie.setPath("/");
-          cookie.setMaxAge(0);
-          response.addCookie(cookie);
-          return ResponseEntity.ok("Logout Successful");
-        }
+    String authHeader = request.getHeader("Authorization");
+    if(authHeader != null && authHeader.startsWith("Bearer ")){
+      String token = authHeader.substring(7);
+      boolean isInvalidated = customerService.removeToken(token) == true || restaurantService.removeToken(token) == true;
+      if(isInvalidated){
+        return ResponseEntity.ok("Logout successfully");
+      } else {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
       }
+    } else {
+      return ResponseEntity.badRequest().body("No token found in request");
     }
-    return ResponseEntity.badRequest().body("No active session found");
   }
 
   @PostMapping("/sendotp")
