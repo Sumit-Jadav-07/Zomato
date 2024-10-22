@@ -33,6 +33,7 @@ public class OrderEntity {
   String authCode;
   Integer status;
   String paymentType;
+  String transactionId;
   String orderDate;
   
 }

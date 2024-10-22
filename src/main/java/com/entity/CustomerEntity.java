@@ -3,10 +3,7 @@ package com.entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-
-import java.util.List;
 
 import jakarta.persistence.Entity;
 import lombok.AccessLevel;
@@ -32,7 +29,7 @@ public class CustomerEntity {
 	String address2;
 	String customerImagePath;
 	String cusToken;
-
+	
 	// @OneToMany(mappedBy = "customer")
 	// private List<CustomerAddressEntity> CustomerAddresses;
 

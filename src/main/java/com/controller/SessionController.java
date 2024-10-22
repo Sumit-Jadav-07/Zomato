@@ -88,11 +88,12 @@ public class SessionController {
             loginRequest.getPassword());
         if (customer != null) {
           // Generate a random token (not JWT)
-          String token = service.generateToken();// Use a simple random UUID as the token
+          // String token = service.generateToken();// Use a simple random UUID as the token
+          String token = jwtService.generateToken(loginRequest.getEmail(), loginRequest.getRole());
           System.out.println("Before");
           System.out.println(token);
           System.out.println("After");
-          customerService.saveToken(loginRequest.getEmail(), token); // Store token in DB or in-memory store like Redis
+          // customerService.saveToken(loginRequest.getEmail(), token); // Store token in DB or in-memory store like Redis
           List<RestaurantEntity> restaurants = restaurantRepo.findByActiveStatus(true);
 
           Map<String, Object> response = new HashMap<>();
@@ -111,11 +112,12 @@ public class SessionController {
         RestaurantEntity restaurant = restaurantService.authenticateRestaurant(loginRequest.getEmail(),
             loginRequest.getPassword());
         if (restaurant != null) {
-          String token = service.generateToken();
+          // String token = service.generateToken();
+          String token = jwtService.generateToken(loginRequest.getEmail(), loginRequest.getRole());
           System.out.println("Before");
           System.out.println(token);
           System.out.println("After");
-          restaurantService.saveToken(loginRequest.getEmail(), token); // Store the token
+          // restaurantService.saveToken(loginRequest.getEmail(), token); // Store the token
 
           Map<String, Object> response = new HashMap<>();
           response.put("message", "Login Successful as Restaurant.");

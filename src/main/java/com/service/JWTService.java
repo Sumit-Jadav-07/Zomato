@@ -51,6 +51,19 @@ public class JWTService {
     return Keys.hmacShaKeyFor(keyBytes);
   }
 
+  public boolean validateToken(String token) {
+    try {
+      Jwts.parserBuilder()
+          .setSigningKey(getKey())
+          .build()
+          .parseClaimsJws(token);
+      return true;
+    } catch (Exception e) {
+      System.out.println("Invalid or expired token: " + e.getMessage());
+      return false;
+    }
+  }
+
   public String validateTokeAndGetEmail(String token) {
     Claims claims = Jwts.parserBuilder()
         .setSigningKey(getKey())

@@ -53,6 +53,7 @@ public class CartController {
     }
 
     Integer customerId = (Integer) request.getAttribute("customerId");
+
     System.out.println("Customer Id : " + customerId);
     if (customerId == null) {
       return ResponseEntity.badRequest().body("CustomerId cannot be null");
