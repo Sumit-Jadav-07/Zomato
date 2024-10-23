@@ -36,8 +36,6 @@ public class MenuItemEntity {
   Boolean activeStatus = true;
   String itemImagePath;
   Boolean isOffer = true;
-  Integer offerQty;
-  Double offerPercentage;
-  Double uptoAmount;
+  String offerType;
   
 }

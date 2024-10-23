@@ -48,7 +48,7 @@ public class ChargeCreditCard {
         txnRequest.setTransactionType(TransactionTypeEnum.AUTH_CAPTURE_TRANSACTION.value());
         txnRequest.setPayment(paymentType);
         txnRequest.setCustomer(customer);
-        txnRequest.setAmount(new BigDecimal(checkoutRequest.getTotalAmount()).setScale(2, RoundingMode.CEILING));
+        txnRequest.setAmount(BigDecimal.valueOf(checkoutRequest.getTotalAmount()).setScale(2, RoundingMode.CEILING));
 
         System.out.println("PHASE - 6");
 
