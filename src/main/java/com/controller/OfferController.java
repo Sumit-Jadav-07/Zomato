@@ -93,7 +93,7 @@ public class OfferController {
         }
     }
 
-    @GetMapping("/item/{itemId}")
+    @GetMapping("/getOffer/{itemId}")
     public ResponseEntity<?> getOffersForMenuItem(@PathVariable Integer itemId) {
         List<OfferEntity> offers = offerRepo.findByMenuItemItemId(itemId);
         if (offers.isEmpty()) {
